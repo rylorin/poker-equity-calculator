@@ -1,0 +1,41 @@
+{
+  "name": "poker-equity-calculator",
+  "version": "1.0.0",
+  "description": "A TypeScript library for calculating poker hand equities across different game variants",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "poker",
+    "equity",
+    "calculator",
+    "odds",
+    "monte-carlo",
+    "holdem",
+    "omaha"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.5",
+    "@types/node": "^20.8.2",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.50.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.0.3",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}
