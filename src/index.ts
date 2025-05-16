@@ -1,21 +1,27 @@
-import { Card, CardString, Rank, Suit } from './types/card';
-import { Hand, HandRank, EvaluatedHand } from './types/hand';
-import { Board, BoardStage } from './types/board';
-import { GameVariant } from './types/game';
-import { EquityResult, CalculationOptions } from './types/result';
+import { Board, BoardStage } from "./types/board";
+import { Card, CardString, Rank, Suit } from "./types/card";
+import { GameVariant } from "./types/game";
+import { EvaluatedHand, Hand, HandRank } from "./types/hand";
+import { CalculationOptions, EquityResult } from "./types/result";
 
-import { createCard, createCards, cardToString } from './models/card';
-import { createHand, handToString, isHandComplete } from './models/hand';
-import { createBoard, boardToString, getBoardStage } from './models/board';
-import { Deck } from './models/deck';
+import { boardToString, createBoard, getBoardStage } from "./models/board";
+import { cardToString, createCard, createCards } from "./models/card";
+import { Deck } from "./models/deck";
+import { createHand, handToString } from "./models/hand";
 
-import { EvaluatorFactory } from './evaluators/evaluator';
-import { MonteCarloCalculator } from './calculators/monte-carlo';
-import { ExhaustiveCalculator } from './calculators/exhaustive';
+import { ExhaustiveCalculator } from "./calculators/exhaustive";
+import { MonteCarloCalculator } from "./calculators/monte-carlo";
+import { EvaluatorFactory } from "./evaluators/evaluator";
 
 // Import evaluators to ensure they're registered
-import './evaluators/holdem';
-import './evaluators/omaha';
+import "./evaluators/holdem";
+import "./evaluators/omaha";
+
+const defaultOptions: CalculationOptions = {
+  forceExhaustive: false,
+  maxExhaustiveCombinations: 900,
+  iterations: 1_000,
+};
 
 /**
  * Main class for poker equity calculation
@@ -25,14 +31,14 @@ export class PokerEquityCalculator {
   private board: Board = { cards: [] };
   private deadCards: Card[] = [];
   private gameVariant: GameVariant = GameVariant.TEXAS_HOLDEM;
-  
+
   /**
    * Creates a new equity calculator instance
    */
   constructor(gameVariant: GameVariant = GameVariant.TEXAS_HOLDEM) {
     this.gameVariant = gameVariant;
   }
-  
+
   /**
    * Sets the game variant
    */
@@ -40,7 +46,7 @@ export class PokerEquityCalculator {
     this.gameVariant = variant;
     return this;
   }
-  
+
   /**
    * Adds a player hand
    */
@@ -49,7 +55,7 @@ export class PokerEquityCalculator {
     this.hands.push(hand);
     return this;
   }
-  
+
   /**
    * Sets the community board
    */
@@ -57,7 +63,7 @@ export class PokerEquityCalculator {
     this.board = createBoard(boardStr, this.gameVariant);
     return this;
   }
-  
+
   /**
    * Adds dead cards (cards that are known to be unavailable)
    */
@@ -66,7 +72,7 @@ export class PokerEquityCalculator {
     this.deadCards.push(...cards);
     return this;
   }
-  
+
   /**
    * Clears all player hands
    */
@@ -74,7 +80,7 @@ export class PokerEquityCalculator {
     this.hands = [];
     return this;
   }
-  
+
   /**
    * Clears the board
    */
@@ -82,7 +88,7 @@ export class PokerEquityCalculator {
     this.board = { cards: [] };
     return this;
   }
-  
+
   /**
    * Clears dead cards
    */
@@ -90,7 +96,7 @@ export class PokerEquityCalculator {
     this.deadCards = [];
     return this;
   }
-  
+
   /**
    * Resets everything (hands, board, dead cards)
    */
@@ -100,63 +106,48 @@ export class PokerEquityCalculator {
     this.deadCards = [];
     return this;
   }
-  
+
   /**
    * Calculates equity for all player hands
    */
   async calculateEquity(options: CalculationOptions = {}): Promise<EquityResult> {
     if (this.hands.length < 2) {
-      throw new Error('At least two player hands are required for equity calculation');
+      throw new Error("At least two player hands are required for equity calculation");
     }
-    
+
     // Determine whether to use Monte Carlo or exhaustive calculation
     const { totalCombinations } = this.estimateCombinations();
-    const shouldUseExhaustive = 
-      options.forceExhaustive || 
-      totalCombinations <= (options.maxExhaustiveCombinations || 25000);
-    
-    if (shouldUseExhaustive) {
+    const shouldUseExhaustive =
+      options.forceExhaustive || totalCombinations <= (options.maxExhaustiveCombinations || 25000);
+
+    if (false /*shouldUseExhaustive */) {
       // Use exhaustive calculation for exact results
-      const calculator = new ExhaustiveCalculator(
-        this.hands,
-        this.board,
-        this.deadCards,
-        this.gameVariant,
-        options
-      );
+      const calculator = new ExhaustiveCalculator(this.hands, this.board, this.deadCards, this.gameVariant, options);
       return calculator.calculate();
     } else {
       // Use Monte Carlo simulation for large combinations
-      const calculator = new MonteCarloCalculator(
-        this.hands,
-        this.board,
-        this.deadCards,
-        this.gameVariant,
-        options
-      );
+      const calculator = new MonteCarloCalculator(this.hands, this.board, this.deadCards, this.gameVariant, options);
       return calculator.calculate();
     }
   }
-  
+
   /**
    * Estimates the number of combinations that would need to be evaluated
    */
   private estimateCombinations(): { totalCombinations: number } {
     // Count cards that are already used
-    const usedCardCount = 
-      this.board.cards.length + 
-      this.deadCards.length + 
-      this.hands.reduce((sum, hand) => sum + hand.cards.length, 0);
-    
+    const usedCardCount =
+      this.board.cards.length + this.deadCards.length + this.hands.reduce((sum, hand) => sum + hand.cards.length, 0);
+
     // Count how many more cards need to be dealt
     let cardsNeeded = 0;
-    
+
     // Determine how many more board cards are needed (up to 5 total)
     const boardCardsNeeded = 5 - this.board.cards.length;
     if (boardCardsNeeded > 0) {
       cardsNeeded += boardCardsNeeded;
     }
-    
+
     // Add cards needed to complete each hand
     for (const hand of this.hands) {
       const handCardsNeeded = (this.gameVariant === GameVariant.OMAHA ? 4 : 2) - hand.cards.length;
@@ -164,24 +155,24 @@ export class PokerEquityCalculator {
         cardsNeeded += handCardsNeeded;
       }
     }
-    
+
     // Calculate combinations
     if (cardsNeeded === 0) {
       return { totalCombinations: 1 };
     }
-    
+
     // Number of remaining cards in the deck
     const remainingCards = 52 - usedCardCount;
-    
+
     // Calculate n choose k: ways to choose cardsNeeded from remainingCards
     let combinations = 1;
     for (let i = 0; i < cardsNeeded; i++) {
       combinations *= (remainingCards - i) / (i + 1);
     }
-    
+
     return { totalCombinations: Math.round(combinations) };
   }
-  
+
   /**
    * Evaluates a specific hand against the current board
    */
@@ -194,21 +185,31 @@ export class PokerEquityCalculator {
 
 // Export all the necessary types and functions
 export {
+  Board,
+  BoardStage,
+  boardToString,
+  CalculationOptions,
   // Types
-  Card, CardString, Rank, Suit,
-  Hand, HandRank, EvaluatedHand,
-  Board, BoardStage,
-  GameVariant,
-  EquityResult, CalculationOptions,
-  
+  Card,
+  CardString,
+  cardToString,
+  createBoard,
   // Functions
-  createCard, createCards, cardToString,
-  createHand, handToString,
-  createBoard, boardToString, getBoardStage,
-  
+  createCard,
+  createCards,
+  createHand,
   // Classes
   Deck,
+  EquityResult,
+  EvaluatedHand,
   EvaluatorFactory,
+  ExhaustiveCalculator,
+  GameVariant,
+  getBoardStage,
+  Hand,
+  HandRank,
+  handToString,
   MonteCarloCalculator,
-  ExhaustiveCalculator
+  Rank,
+  Suit,
 };

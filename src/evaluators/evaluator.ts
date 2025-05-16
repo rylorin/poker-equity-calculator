@@ -83,4 +83,4 @@ export abstract class BaseEvaluator implements HandEvaluator {
   }
 }
 
-export { BaseEvaluator }
+// export { BaseEvaluator }
