@@ -1,4 +1,12 @@
-import { GameVariant, PokerEquityCalculator } from "../src";
+import { EquityResult, GameVariant, PokerEquityCalculator } from "../src";
+
+function displayResult(test: string, result: EquityResult) {
+  console.log(`result of ${test}:`, result);
+  for (const player of result.playerResults) {
+    console.log(player);
+    // console.log(player.winningHandRankCounts);
+  }
+}
 
 describe("Texas Hold'em Equity Calculation", () => {
   // jest.setTimeout(5 * 1_000);
@@ -98,7 +106,7 @@ describe("Texas Hold'em Equity Calculation", () => {
 
     // Both players should have equal equity
     expect(result.playerResults[0].equity).toBe(0.5);
-    expect(result.playerResults[1].equity).toBe(0.5);
+    expect(result.playerResults[1].equity).toBe(result.playerResults[0].equity);
 
     // Check that ties are correctly counted
     expect(result.playerResults[0].tie).toBe(1);
@@ -133,6 +141,47 @@ describe("Texas Hold'em Equity Calculation", () => {
     calculator.setBoard("2s3s4h5c7d");
 
     const result = await calculator.calculateEquity({});
+    console.log("result:", result);
+
+    expect(result.isExact).toBe(false);
+    expect(result.playerResults.length).toBe(2);
+
+    expect(result.playerResults[0].equity).toBeCloseTo(0.4545);
+    expect(result.playerResults[0].win).toBeCloseTo(0);
+    expect(result.playerResults[0].tie).toBeCloseTo(0.9091);
+
+    expect(result.playerResults[1].equity).toBeCloseTo(0.5455);
+    expect(result.playerResults[1].win).toBeCloseTo(0.0909);
+    expect(result.playerResults[1].tie).toBe(result.playerResults[0].tie);
+  });
+
+  test("Second hand wins", async () => {
+    calculator.addHand("AsKs");
+    calculator.addHand("Ah6d");
+    calculator.setBoard("2s3s4h5c7d");
+
+    const result = await calculator.calculateEquity({});
+    displayResult("Second hand wins", result);
+
+    expect(result.isExact).toBe(false);
+    expect(result.playerResults.length).toBe(2);
+
+    expect(result.playerResults[0].equity).toBeCloseTo(0.4545);
+    expect(result.playerResults[0].win).toBeCloseTo(0);
+    expect(result.playerResults[0].tie).toBeCloseTo(0.9091);
+
+    expect(result.playerResults[1].equity).toBeCloseTo(0.5455);
+    expect(result.playerResults[1].win).toBeCloseTo(0.0909);
+    expect(result.playerResults[1].tie).toBe(result.playerResults[0].tie);
+  });
+
+  test("poker-odds-calc example", async () => {
+    calculator.addHand("QsKs");
+    calculator.addHand("QdKd");
+    calculator.setBoard("JsTs5hTd");
+
+    const result = await calculator.calculateEquity({});
+    displayResult("poker-odds-calc example", result);
 
     expect(result.isExact).toBe(false);
     expect(result.playerResults.length).toBe(2);

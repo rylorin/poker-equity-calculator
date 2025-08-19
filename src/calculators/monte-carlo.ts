@@ -16,7 +16,7 @@ export class MonteCarloCalculator extends EquityCalculator {
     const startTime = Date.now();
 
     // Get the maximum number of iterations to run
-    const maxIterations = this.options.iterations || 100000;
+    const maxIterations = this.options.iterations || 100_000;
 
     // Initialize results
     const playerResults = this.createInitialPlayerEquities();
@@ -33,7 +33,7 @@ export class MonteCarloCalculator extends EquityCalculator {
     // Run simulations until we reach the maximum or achieve desired accuracy
     while (iterationsCompleted < maxIterations) {
       // Run a batch of simulations
-      const batchSize = 1000;
+      const batchSize = 1_000;
       const batchesToRun = Math.min(batchSize, maxIterations - iterationsCompleted);
 
       await this.runSimulationBatch(batchesToRun, playerResults);
