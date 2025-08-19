@@ -128,8 +128,8 @@ export abstract class EquityCalculator {
     return this.hands.map((_, index) => ({
       handIndex: index,
       equity: 0,
-      win: 0,
-      tie: 0,
+      wins: 0,
+      ties: 0,
       winsCount: 0,
       tiesCount: 0,
       handRankCounts: {} as RankCount,

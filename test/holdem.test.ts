@@ -109,10 +109,10 @@ describe("Texas Hold'em Equity Calculation", () => {
     expect(result.playerResults[1].equity).toBe(result.playerResults[0].equity);
 
     // Check that ties are correctly counted
-    expect(result.playerResults[0].tie).toBe(1);
-    expect(result.playerResults[1].tie).toBe(1);
-    expect(result.playerResults[0].win).toBe(0);
-    expect(result.playerResults[1].win).toBe(0);
+    expect(result.playerResults[0].ties).toBe(1);
+    expect(result.playerResults[1].ties).toBe(1);
+    expect(result.playerResults[0].wins).toBe(0);
+    expect(result.playerResults[1].wins).toBe(0);
   });
 
   test("Incomplete Flop", async () => {
@@ -127,12 +127,12 @@ describe("Texas Hold'em Equity Calculation", () => {
     expect(result.playerResults.length).toBe(2);
 
     expect(result.playerResults[0].equity).toBeCloseTo(0.7386, 2);
-    expect(result.playerResults[0].win).toBeCloseTo(0.4881, 1);
-    expect(result.playerResults[0].tie).toBeCloseTo(0.5011);
+    expect(result.playerResults[0].wins).toBeCloseTo(0.4881, 1);
+    expect(result.playerResults[0].ties).toBeCloseTo(0.5011);
 
     expect(result.playerResults[1].equity).toBeCloseTo(0.2614);
-    expect(result.playerResults[1].win).toBeCloseTo(0.0109, 1);
-    expect(result.playerResults[1].tie).toBe(result.playerResults[0].tie);
+    expect(result.playerResults[1].wins).toBeCloseTo(0.0109, 1);
+    expect(result.playerResults[1].ties).toBe(result.playerResults[0].ties);
   });
 
   test("Incomplete Hand", async () => {
@@ -147,12 +147,12 @@ describe("Texas Hold'em Equity Calculation", () => {
     expect(result.playerResults.length).toBe(2);
 
     expect(result.playerResults[0].equity).toBeCloseTo(0.4545);
-    expect(result.playerResults[0].win).toBeCloseTo(0);
-    expect(result.playerResults[0].tie).toBeCloseTo(0.9091);
+    expect(result.playerResults[0].wins).toBeCloseTo(0);
+    expect(result.playerResults[0].ties).toBeCloseTo(0.9091);
 
     expect(result.playerResults[1].equity).toBeCloseTo(0.5455);
-    expect(result.playerResults[1].win).toBeCloseTo(0.0909);
-    expect(result.playerResults[1].tie).toBe(result.playerResults[0].tie);
+    expect(result.playerResults[1].wins).toBeCloseTo(0.0909);
+    expect(result.playerResults[1].ties).toBe(result.playerResults[0].ties);
   });
 
   test("Second hand wins", async () => {
@@ -167,12 +167,12 @@ describe("Texas Hold'em Equity Calculation", () => {
     expect(result.playerResults.length).toBe(2);
 
     expect(result.playerResults[0].equity).toBeCloseTo(0.4545);
-    expect(result.playerResults[0].win).toBeCloseTo(0);
-    expect(result.playerResults[0].tie).toBeCloseTo(0.9091);
+    expect(result.playerResults[0].wins).toBeCloseTo(0);
+    expect(result.playerResults[0].ties).toBeCloseTo(0.9091);
 
     expect(result.playerResults[1].equity).toBeCloseTo(0.5455);
-    expect(result.playerResults[1].win).toBeCloseTo(0.0909);
-    expect(result.playerResults[1].tie).toBe(result.playerResults[0].tie);
+    expect(result.playerResults[1].wins).toBeCloseTo(0.0909);
+    expect(result.playerResults[1].ties).toBe(result.playerResults[0].ties);
   });
 
   test("poker-odds-calc example", async () => {
@@ -187,11 +187,11 @@ describe("Texas Hold'em Equity Calculation", () => {
     expect(result.playerResults.length).toBe(2);
 
     expect(result.playerResults[0].equity).toBeCloseTo(0.4545);
-    expect(result.playerResults[0].win).toBeCloseTo(0);
-    expect(result.playerResults[0].tie).toBeCloseTo(0.9091);
+    expect(result.playerResults[0].wins).toBeCloseTo(0);
+    expect(result.playerResults[0].ties).toBeCloseTo(0.9091);
 
     expect(result.playerResults[1].equity).toBeCloseTo(0.5455);
-    expect(result.playerResults[1].win).toBeCloseTo(0.0909);
-    expect(result.playerResults[1].tie).toBe(result.playerResults[0].tie);
+    expect(result.playerResults[1].wins).toBeCloseTo(0.0909);
+    expect(result.playerResults[1].ties).toBe(result.playerResults[0].ties);
   });
 });
