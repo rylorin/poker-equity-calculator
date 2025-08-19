@@ -7,8 +7,8 @@ export type RankCount = Record<HandRank, number>;
 export interface PlayerEquity {
   handIndex: number;
   equity: number;
-  win: number;
-  tie: number;
+  wins: number;
+  ties: number;
   winsCount: number;
   tiesCount: number;
   handRankCounts: RankCount;

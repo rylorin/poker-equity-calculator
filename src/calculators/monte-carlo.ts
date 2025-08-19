@@ -92,8 +92,8 @@ export class MonteCarloCalculator extends EquityCalculator {
     // Calculate final equity percentages
     for (const result of playerResults) {
       result.equity = (result.winsCount + result.tiesCount / 2) / iterationsCompleted;
-      result.win = result.winsCount / iterationsCompleted;
-      result.tie = result.tiesCount / iterationsCompleted;
+      result.wins = result.winsCount / iterationsCompleted;
+      result.ties = result.tiesCount / iterationsCompleted;
     }
 
     const elapsedTime = Date.now() - startTime;
